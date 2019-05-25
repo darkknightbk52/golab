@@ -1,6 +1,9 @@
 package registry
 
+import "context"
+
 type Options struct {
+	Context context.Context
 }
 
 type Option func(*Options)
@@ -12,12 +15,25 @@ type Node struct {
 	MetaData map[string]string
 }
 
+type Value struct {
+	Name   string
+	Type   string
+	Values []*Value
+}
+
+type Endpoint struct {
+	Name     string
+	Request  *Value
+	Response *Value
+	MetaData map[string]string
+}
+
 type Service struct {
 	Name      string
 	Version   string
 	MetaData  map[string]string
-	Endpoints []string
-	Nodes     []Node
+	Endpoints []*Endpoint
+	Nodes     []*Node
 }
 
 type WatchOptions struct {

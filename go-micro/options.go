@@ -11,17 +11,28 @@ import (
 )
 
 type Options struct {
-	Context   context.Context
-	Client    client.Client
-	Server    server.Server
-	Broker    broker.Broker
-	Registry  registry.Registry
-	Transport transport.Transport
+	Context     context.Context
+	Name        string
+	Client      client.Client
+	Server      server.Server
+	Broker      broker.Broker
+	Registry    registry.Registry
+	Transport   transport.Transport
+	BeforeStart []func() error
+	AfterStart  []func() error
+	BeforeStop  []func() error
+	AfterStop   []func() error
 }
 
 func Context(ctx context.Context) Option {
 	return func(opts *Options) {
 		opts.Context = ctx
+	}
+}
+
+func Name(name string) Option {
+	return func(opts *Options) {
+		opts.Name = name
 	}
 }
 
@@ -64,6 +75,30 @@ func Transport(t transport.Transport) Option {
 
 func Selector(s selector.Selector) Option {
 	return func(opts *Options) {
-		opts.Client.Options().Selector = s
+		//opts.Client.Options().Selector = nil
+	}
+}
+
+func BeforeStart(fn func() error) Option {
+	return func(opts *Options) {
+		opts.BeforeStart = append(opts.BeforeStart, fn)
+	}
+}
+
+func AfterStart(fn func() error) Option {
+	return func(opts *Options) {
+		opts.AfterStart = append(opts.AfterStart, fn)
+	}
+}
+
+func BeforeStop(fn func() error) Option {
+	return func(opts *Options) {
+		opts.BeforeStop = append(opts.BeforeStop, fn)
+	}
+}
+
+func AfterStop(fn func() error) Option {
+	return func(opts *Options) {
+		opts.AfterStop = append(opts.AfterStop, fn)
 	}
 }
