@@ -5,10 +5,10 @@ import (
 	"github.com/darkknightbk52/golab/go-micro/registry"
 )
 
-var serviceKey struct{}
+type serviceKey struct{}
 
-func getServices(ctx context.Context) map[string]*registry.Service {
-	s, ok := ctx.Value(serviceKey).(map[string]*registry.Service)
+func getServices(ctx context.Context) map[string][]*registry.Service {
+	s, ok := ctx.Value(serviceKey{}).(map[string][]*registry.Service)
 	if !ok {
 		return nil
 	}
@@ -20,6 +20,6 @@ func Services(s map[string]*registry.Service) registry.Option {
 		if opts.Context == nil {
 			opts.Context = context.Background()
 		}
-		opts.Context = context.WithValue(opts.Context, serviceKey, s)
+		opts.Context = context.WithValue(opts.Context, serviceKey{}, s)
 	}
 }

@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"github.com/darkknightbk52/golab/go-micro/registry"
 	. "github.com/onsi/gomega"
 	"testing"
@@ -15,11 +16,11 @@ func TestAddServices(t *testing.T) {
 			Version: "1.0",
 			Nodes: []*registry.Node{
 				{
-					ID:      "node-11",
+					Id:      "node-11",
 					Address: "127.0.0.11",
 				},
 				{
-					ID:      "node-12",
+					Id:      "node-12",
 					Address: "127.0.0.12",
 				},
 			},
@@ -29,11 +30,11 @@ func TestAddServices(t *testing.T) {
 			Version: "2.0",
 			Nodes: []*registry.Node{
 				{
-					ID:      "node-21",
+					Id:      "node-21",
 					Address: "127.0.0.21",
 				},
 				{
-					ID:      "node-22",
+					Id:      "node-22",
 					Address: "127.0.0.22",
 				},
 			},
@@ -46,11 +47,11 @@ func TestAddServices(t *testing.T) {
 			Version: "1.0",
 			Nodes: []*registry.Node{
 				{
-					ID:      "node-1",
+					Id:      "node-11",
 					Address: "127.0.0.111",
 				},
 				{
-					ID:      "node-3",
+					Id:      "node-13",
 					Address: "127.0.0.13",
 				},
 			},
@@ -60,18 +61,43 @@ func TestAddServices(t *testing.T) {
 			Version: "3.0",
 			Nodes: []*registry.Node{
 				{
-					ID:      "node-31",
+					Id:      "node-31",
 					Address: "127.0.0.31",
 				},
 				{
-					ID:      "node-32",
+					Id:      "node-32",
 					Address: "127.0.0.32",
 				},
 			},
 		},
 	}
 
-	srvs := addServices(olds, news)
-	Expect(len(srvs)).Should(Equal(3))
-	Expect()
+	services := addServices(olds, news)
+	Expect(len(services)).Should(Equal(3))
+
+	search := func(services []*registry.Service, version string) *registry.Service {
+		for _, s := range services {
+			if s.Version == version {
+				return s
+			}
+		}
+		return nil
+	}
+
+	expectedVersions := []string{
+		"1.0",
+		"2.0",
+		"3.0",
+	}
+
+	for _, ev := range expectedVersions {
+		s := search(services, ev)
+		Expect(s).ShouldNot(BeNil(), "Not found expected version: "+ev)
+		if ev == "1.0" {
+			Expect(len(s.Nodes)).Should(Equal(3), fmt.Sprintf("Unexpected number of nodes: %d", len(s.Nodes)))
+		} else {
+			Expect(len(s.Nodes)).Should(Equal(2), fmt.Sprintf("Unexpected number of nodes: %d", len(s.Nodes)))
+		}
+		t.Log(s)
+	}
 }
