@@ -1,5 +1,7 @@
 package registry
 
+import "errors"
+
 type Registry interface {
 	Init(...Option) error
 	Options() Options
@@ -16,3 +18,5 @@ type Option func(*Options)
 type WatchOption func(*WatchOptions)
 
 type RegisterOption func(*RegisterOptions)
+
+var ErrNotFound = errors.New("not found")
